@@ -13,10 +13,14 @@ DockPositioner is a macOS menu bar app that gives every monitor its own Dock, on
 - Trash full or empty state, and Empty Trash.
 - Start at login.
 
+## Download
+
+Get the latest notarised build from the [releases page](https://github.com/Datapad-nl/DockPositioner/releases/latest): unzip it and move `DockPositioner.app` to `/Applications`.
+
 ## Requirements
 
 - macOS 14 or later.
-- Xcode or a Swift toolchain, to build.
+- Xcode or a Swift toolchain, only to build from source.
 
 ## Build and run
 
@@ -26,8 +30,6 @@ swift test           # unit tests
 scripts/build-app.sh # release build -> build/DockPositioner.app
 open build/DockPositioner.app
 ```
-
-There is no prebuilt download yet; build from source.
 
 The app has no Dock icon; it lives in the menu bar.
 
