@@ -38,6 +38,24 @@ The app has no Dock icon; it lives in the menu bar.
 
 The Accessibility permission is tied to the signature, and an ad-hoc signature changes on every build, so with ad-hoc builds the permission has to be granted again after each build. To keep it, sign every build with the same identity by setting `CODESIGN_IDENTITY`.
 
+## Release
+
+```sh
+NOTARY_PROFILE=<profile> scripts/release.sh
+```
+
+This builds the app, checks that it is signed with a Developer ID Application identity and the hardened runtime, zips it, has Apple notarise it, staples the ticket and zips it again. The result is `build/DockPositioner-<version>.zip` (the version comes from `CFBundleShortVersionString` in `scripts/build-app.sh`); the script prints the path and the SHA-256. Without `NOTARY_PROFILE` it is a dry run: the zip is signed but not notarised. A release is never ad-hoc signed.
+
+One-time setup, on the machine that releases:
+
+```sh
+xcrun notarytool store-credentials <profile> --apple-id <apple-id> --team-id <team-id>
+```
+
+It asks for an app-specific password (create one at appleid.apple.com) and stores the credentials in your keychain under `<profile>`. Nothing is stored in the repository.
+
+Normal builds signed with a Developer ID now use the hardened runtime too, with the entitlements in `scripts/DockPositioner.entitlements` (Apple events, for Empty Trash).
+
 ## Permissions
 
 None is needed for the basic Dock.

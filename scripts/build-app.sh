@@ -50,5 +50,11 @@ else
     IDENTITY="-"
     echo "No CODESIGN_IDENTITY set and no Datapad Developer ID in the keychain: signing ad-hoc."
 fi
-codesign --force --sign "$IDENTITY" "$APP"
+if [ "$IDENTITY" = "-" ]; then
+    codesign --force --sign "$IDENTITY" "$APP"
+else
+    # Hardened runtime, a secure timestamp and the entitlements file are required for notarisation.
+    codesign --force --sign "$IDENTITY" --options runtime --timestamp \
+        --entitlements scripts/DockPositioner.entitlements "$APP"
+fi
 echo "Built $APP"
