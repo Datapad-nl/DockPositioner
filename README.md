@@ -2,6 +2,8 @@
 
 DockPositioner is a macOS menu bar app that gives every monitor its own Dock, on any edge, including edges where macOS will not put its own Dock. macOS has one Dock, and puts it only on an outer edge of the whole desktop: a Dock on an edge where two monitors touch ends up on the other monitor. DockPositioner draws its own Dock instead, on every monitor that has a profile switched on, each on its own edge with its own settings, all at the same time.
 
+![Two monitors side by side, each with its own Dock: one at the bottom of the left monitor, one on the left edge of the right monitor, where the monitors touch](docs/monitor-setup.png)
+
 ## Features
 
 - Per-monitor position, icon size, magnification and auto-hide.
