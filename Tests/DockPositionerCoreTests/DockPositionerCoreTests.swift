@@ -135,27 +135,39 @@ func withDefaults(_ body: (UserDefaults) throws -> Void) throws {
         let layout = DockLayout(settings: settings(.left, magnification: true), itemCount: 12, screen: main, topInset: 30)
         let y = layout.dockRect.midY
         #expect(layout.frame.width > layout.dockRect.width + 150)  // the margin is wide
-        #expect(layout.acceptsMouse(pointer: CGPoint(x: 10, y: y), hidden: false))
+        #expect(layout.acceptsMouse(pointer: CGPoint(x: 10, y: y), hidden: false, engaged: false))
         // In the label and magnification room next to the Dock, still inside the panel.
         let margin = CGPoint(x: layout.dockRect.maxX + 20, y: y)
         #expect(layout.frame.contains(margin))
-        #expect(!layout.acceptsMouse(pointer: margin, hidden: false))
-        #expect(!layout.acceptsMouse(pointer: CGPoint(x: -10, y: y), hidden: false))  // on the monitor to the left
-        #expect(!layout.acceptsMouse(pointer: CGPoint(x: 10, y: y), hidden: true))  // hidden auto-hide Dock
+        #expect(!layout.acceptsMouse(pointer: margin, hidden: false, engaged: false))
+        #expect(!layout.acceptsMouse(pointer: CGPoint(x: -10, y: y), hidden: false, engaged: false))  // on the monitor to the left
+        #expect(!layout.acceptsMouse(pointer: CGPoint(x: 10, y: y), hidden: true, engaged: false))  // hidden auto-hide Dock
+    }
+
+    @Test func hoverStartsOnlyOverTheRestingDock() {
+        let layout = DockLayout(settings: settings(.left, magnification: true), itemCount: 12, screen: main, topInset: 30)
+        let y = layout.dockRect.midY
+        let inside = CGPoint(x: layout.restRect.maxX - 2, y: y)
+        let growth = CGPoint(x: layout.restRect.maxX + 5, y: y)  // room for magnified icons
+        #expect(layout.dockRect.contains(growth))
+        #expect(layout.acceptsMouse(pointer: inside, hidden: false, engaged: false))
+        #expect(layout.acceptsMouse(pointer: inside, hidden: false, engaged: true))
+        #expect(!layout.acceptsMouse(pointer: growth, hidden: false, engaged: false))
+        #expect(layout.acceptsMouse(pointer: growth, hidden: false, engaged: true))
     }
 
     @Test func bottomDockTakesTheMouseOnlyInsideTheDock() {
         let layout = DockLayout(settings: settings(.bottom, magnification: true), itemCount: 12, screen: side)
         let x = layout.dockRect.midX
-        #expect(layout.acceptsMouse(pointer: CGPoint(x: x, y: side.minY + 5), hidden: false))
+        #expect(layout.acceptsMouse(pointer: CGPoint(x: x, y: side.minY + 5), hidden: false, engaged: false))
         let above = CGPoint(x: x, y: layout.dockRect.maxY + 10)
         #expect(layout.frame.contains(above))
-        #expect(!layout.acceptsMouse(pointer: above, hidden: false))
+        #expect(!layout.acceptsMouse(pointer: above, hidden: false, engaged: false))
         let end = CGPoint(x: layout.dockRect.minX - 20, y: side.minY + 5)  // room beyond the end icon
         #expect(layout.frame.contains(end))
-        #expect(!layout.acceptsMouse(pointer: end, hidden: false))
-        #expect(!layout.acceptsMouse(pointer: CGPoint(x: 100, y: 5), hidden: false))  // on the main monitor
-        #expect(!layout.acceptsMouse(pointer: CGPoint(x: x, y: side.minY + 5), hidden: true))
+        #expect(!layout.acceptsMouse(pointer: end, hidden: false, engaged: false))
+        #expect(!layout.acceptsMouse(pointer: CGPoint(x: 100, y: 5), hidden: false, engaged: false))  // on the main monitor
+        #expect(!layout.acceptsMouse(pointer: CGPoint(x: x, y: side.minY + 5), hidden: true, engaged: false))
     }
 
     @Test func noMagnificationWhenSwitchedOff() {

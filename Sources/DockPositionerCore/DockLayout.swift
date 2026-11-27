@@ -89,6 +89,15 @@ public struct DockLayout: Equatable, Sendable {
         }
     }
 
+    /// The resting Dock background, without the room for magnified icons, in screen coordinates.
+    public var restRect: CGRect {
+        switch edge {
+        case .bottom: return CGRect(x: frame.minX + margin, y: frame.minY, width: dockLength, height: dockThickness)
+        case .left: return CGRect(x: frame.minX, y: frame.minY + margin, width: dockThickness, height: dockLength)
+        case .right: return CGRect(x: frame.maxX - dockThickness, y: frame.minY + margin, width: dockThickness, height: dockLength)
+        }
+    }
+
     /// Whether the pointer is at this monitor's edge, next to the Dock. A point beyond the edge
     /// (on a neighbouring monitor) does not count.
     public func revealsDock(pointer p: CGPoint) -> Bool {
@@ -101,10 +110,11 @@ public struct DockLayout: Equatable, Sendable {
         }
     }
 
-    /// Whether the panel should take the mouse with the pointer here. Everywhere else (the room for labels and
-    /// magnified icons, other monitors, a hidden auto-hide Dock) clicks go to whatever is underneath.
-    public func acceptsMouse(pointer p: CGPoint, hidden: Bool) -> Bool {
-        !hidden && dockRect.contains(p)
+    /// Whether the panel should take the mouse with the pointer here. Hover starts only over the resting Dock; once
+    /// `engaged` it lasts through the room for magnified icons. Everywhere else (other monitors, a hidden
+    /// auto-hide Dock) clicks go to whatever is underneath.
+    public func acceptsMouse(pointer p: CGPoint, hidden: Bool, engaged: Bool) -> Bool {
+        !hidden && (engaged ? dockRect : restRect).contains(p)
     }
 
     // MARK: View coordinates

@@ -71,7 +71,7 @@ final class DockPanel {
             hidden = false
             leftAt = nil
             place(animated: true)
-        } else if layout.dockRect.contains(pointer) {
+        } else if (state.hover != nil ? layout.dockRect : layout.restRect).contains(pointer) {
             leftAt = nil
         } else if let leftAt {
             guard now - leftAt > 0.6 else { return }
@@ -87,12 +87,13 @@ final class DockPanel {
     /// While a mouse button is held the panel keeps taking the mouse or not, so a click is never cut off.
     func pointerMoved(to pointer: CGPoint, buttonsHeld: Bool) {
         let layout = state.layout
+        let engaged = state.hover != nil
         if !buttonsHeld {
-            let ignores = !layout.acceptsMouse(pointer: pointer, hidden: hidden)
+            let ignores = !layout.acceptsMouse(pointer: pointer, hidden: hidden, engaged: engaged)
             if panel.ignoresMouseEvents != ignores { panel.ignoresMouseEvents = ignores }
         }
         let frame = layout.frame
-        let hover = !panel.ignoresMouseEvents && layout.dockRect.contains(pointer)
+        let hover = !panel.ignoresMouseEvents && (engaged ? layout.dockRect : layout.restRect).contains(pointer)
             ? CGPoint(x: pointer.x - frame.minX, y: frame.maxY - pointer.y) : nil
         if state.hover != hover { state.hover = hover }
     }
@@ -100,7 +101,7 @@ final class DockPanel {
     private func place(animated: Bool) {
         let frame = hidden ? state.layout.hiddenFrame : state.layout.frame
         let alpha: CGFloat = hidden ? 0 : 1
-        panel.ignoresMouseEvents = !state.layout.acceptsMouse(pointer: NSEvent.mouseLocation, hidden: hidden)
+        panel.ignoresMouseEvents = !state.layout.acceptsMouse(pointer: NSEvent.mouseLocation, hidden: hidden, engaged: state.hover != nil)
         guard animated else {
             panel.setFrame(frame, display: true)
             panel.alphaValue = alpha
